@@ -52,6 +52,11 @@ panelColor =
     hex "F6B800"
 
 
+panelLinkColor : Color
+panelLinkColor =
+    hex "F9C103"
+
+
 
 -- Typography
 

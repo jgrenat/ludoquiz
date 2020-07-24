@@ -3,6 +3,7 @@ module DesignSystem.Typography exposing (FontFamily(..), FontSize(..), Typograph
 import Css exposing (..)
 import Css.Global as Css
 import DesignSystem.Colors as Colors
+import DesignSystem.Responsive exposing (onMobile)
 import Html.Styled as Html exposing (Attribute, Html, text)
 import Html.Styled.Attributes exposing (class)
 
@@ -14,6 +15,7 @@ type TypographyType
     | Title2
     | MainTitleFirstPart
     | MainTitleSecondPart
+    | HeroText
 
 
 type FontSize
@@ -92,6 +94,9 @@ getClassName typographyType =
         DateTime ->
             "dateTime"
 
+        HeroText ->
+            "heroText"
+
 
 getStylesFor : TypographyType -> List Style
 getStylesFor typographyType =
@@ -101,18 +106,10 @@ getStylesFor typographyType =
             ]
 
         MainTitleFirstPart ->
-            [ fontSize XXL
-            , fontWeight (int 900)
-            , fontFamily MainTitleFont
-            , color Colors.primary
-            ]
+            color Colors.primary :: mainTitleStyles
 
         MainTitleSecondPart ->
-            [ fontSize XXL
-            , fontWeight (int 900)
-            , fontFamily MainTitleFont
-            , color Colors.secondary
-            ]
+            color Colors.secondary :: mainTitleStyles
 
         Title1 ->
             [ fontSize XL
@@ -131,8 +128,22 @@ getStylesFor typographyType =
             , fontStyle italic
             ]
 
+        HeroText ->
+            [ fontSize L
+            , fontWeight (int 500)
+            ]
+
+
+mainTitleStyles : List Style
+mainTitleStyles =
+    [ fontSize XXL
+    , fontWeight (int 900)
+    , fontFamily MainTitleFont
+    , onMobile [ fontSize XL ]
+    ]
+
 
 styles : List Css.Snippet
 styles =
-    [ Paragraph, Title1, Title2, MainTitleFirstPart, MainTitleSecondPart, DateTime ]
+    [ Paragraph, Title1, Title2, MainTitleFirstPart, MainTitleSecondPart, DateTime, HeroText ]
         |> List.map (\typographyType -> Css.class (getClassName typographyType) (getStylesFor typographyType))

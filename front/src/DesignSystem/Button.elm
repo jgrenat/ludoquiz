@@ -3,6 +3,7 @@ module DesignSystem.Button exposing (ButtonSize(..), ButtonType(..), button, but
 import Css exposing (Color, Style, animationDuration, animationIterationCount, animationName, backgroundColor, border, border3, borderRadius, center, color, cursor, display, em, fontFamilies, height, inlineBlock, int, margin2, none, notAllowed, padding2, pct, pointer, property, px, rem, sec, solid, textAlign, textDecoration, textTransform, transparent, uppercase, width, zero)
 import Css.Animations as Animations exposing (keyframes)
 import Css.Global as Css exposing (withClass)
+import Css.Media as Media
 import DesignSystem.Colors as Colors
 import DesignSystem.Input exposing (searchInputHeight)
 import DesignSystem.Spacing exposing (SpacingSize(..), spacing)
@@ -108,8 +109,10 @@ styles =
             [ backgroundColor Colors.primaryButtonBackground
             , color Colors.primaryButtonText
             , border3 (px 1) solid Colors.primaryButtonBorder
-            , Css.hover
-                [ backgroundColor Colors.primaryButtonHoverBackground
+            , Media.withMedia [ Media.all [ Media.hover Media.canHover ] ]
+                [ Css.hover
+                    [ backgroundColor Colors.primaryButtonHoverBackground
+                    ]
                 ]
             , Css.active
                 [ backgroundColor Colors.primaryButtonActiveBackground

@@ -1,6 +1,6 @@
 module DesignSystem.Global exposing (styles)
 
-import Css exposing (auto, backgroundColor, backgroundImage, backgroundSize, block, borderRadius, boxShadow, boxShadow5, center, contain, cover, display, fontStyle, fontWeight, height, int, italic, margin, maxWidth, minHeight, none, pct, px, rgba, textAlign, textDecoration, underline, url)
+import Css exposing (auto, backgroundColor, backgroundImage, backgroundSize, block, borderRadius, boxShadow, boxShadow5, center, contain, cover, display, fontStyle, fontWeight, height, int, italic, margin, maxWidth, minHeight, none, pct, px, rgba, textAlign, textDecoration, underline, url, width)
 import Css.Global as Css exposing (Snippet, em)
 import DesignSystem.Button exposing (ButtonSize(..))
 import DesignSystem.Colors as Colors
@@ -23,9 +23,15 @@ styles =
         [ textAlign center
         , display block
         , marginBottom M
+        , Css.children [ Css.a [ textDecoration none ] ]
+        ]
+    , Css.a
+        [ textDecoration underline
+        , Css.hover [ textDecoration none ]
         ]
     , Css.class "container"
-        [ maxWidth (px 800)
+        [ maxWidth (pct 100)
+        , width (px 800)
         , margin auto
         , backgroundColor Colors.containerBackground
         , padding2 M M
@@ -37,6 +43,14 @@ styles =
         , padding2 S S
         , boxShadow5 (px 0) (px 1) (px 10) (px -4) Colors.containerShadow
         , borderRadius (px 10)
+        ]
+    , Css.a
+        [ Css.children
+            [ Css.class "panel"
+                [ Css.hover [ backgroundColor Colors.panelLinkColor ]
+                , textDecoration none
+                ]
+            ]
         ]
     , Css.typeSelector "block-content"
         [ Css.descendants

@@ -18,6 +18,14 @@ type alias QuizId =
     Id String QuizIdMarker
 
 
+type AnswerIdMarker
+    = AnswerIdMarker Never
+
+
+type alias AnswerId =
+    Id String AnswerIdMarker
+
+
 type alias Quiz =
     { id : QuizId
     , createdAt : Posix
@@ -44,7 +52,7 @@ type alias Question =
 
 
 type alias Answer =
-    { answer : String, isCorrect : Bool }
+    { id : AnswerId, answer : String, isCorrect : Bool }
 
 
 findAll : (WebData (List QuizPreview) -> msg) -> Cmd msg
@@ -120,6 +128,7 @@ questionDecoder =
 
 answerDecoder : Decoder Answer
 answerDecoder =
-    Decode.map2 Answer
+    Decode.map3 Answer
+        (Decode.field "_key" (Id.decoder Decode.string))
         (Decode.field "answer" Decode.string)
         (Decode.oneOf [ Decode.field "isCorrect" Decode.bool, Decode.succeed False ])

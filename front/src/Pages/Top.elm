@@ -1,6 +1,6 @@
 module Pages.Top exposing (Model, Msg, Params, page)
 
-import Css exposing (color, displayFlex, flexWrap, justifyContent, pct, spaceBetween, width, wrap)
+import Css exposing (backgroundColor, center, color, displayFlex, flexWrap, justifyContent, none, pct, spaceBetween, textAlign, textDecoration, width, wrap)
 import Css.Global as Css exposing (Snippet)
 import DesignSystem.Colors as Colors
 import DesignSystem.Spacing as Spacing exposing (marginTop)
@@ -71,7 +71,7 @@ update msg model =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.none
 
 
@@ -85,7 +85,8 @@ view model =
     , body =
         [ Css.global styles
         , div []
-            [ case model.quizPreviews of
+            [ typography HeroText p [ class "catchPhrase" ] "Un nouveau quiz chaque jour !"
+            , case model.quizPreviews of
                 Success quizPreviews ->
                     List.map (viewQuizPreview model.timeAndZone) quizPreviews |> ul [ class "quizPreviews" ]
 
@@ -126,8 +127,11 @@ viewQuizPreview timeAndZone quizPreview =
 
 styles : List Snippet
 styles =
-    [ Css.class "quizDetails"
+    [ Css.class "catchPhrase"
+        [ textAlign center ]
+    , Css.class "quizDetails"
         [ marginTop Spacing.M
+        , Css.children [ Css.a [ textDecoration none ] ]
         ]
     , Css.class "quizDetailsElements"
         [ displayFlex

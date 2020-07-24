@@ -1,14 +1,15 @@
 module Pages.Quiz.QuizSlug_String exposing (Model, Msg, Params, page)
 
-import Css exposing (alignItems, auto, backgroundColor, borderRadius, center, color, column, display, displayFlex, flexDirection, flexGrow, flexWrap, inlineBlock, int, justifyContent, margin, maxHeight, maxWidth, pct, px, spaceAround, stretch, textAlign, vh, width, wrap)
+import Browser.Dom as Dom exposing (getElement)
+import Css exposing (alignItems, auto, center, color, column, display, displayFlex, flexDirection, flexGrow, flexWrap, inlineBlock, int, justifyContent, margin, maxHeight, maxWidth, none, pct, px, spaceAround, stretch, textAlign, textDecoration, vh, width, wrap)
 import Css.Global as Css exposing (Snippet)
 import DesignSystem.Button exposing (ButtonSize(..), ButtonType(..), button, buttonLink)
 import DesignSystem.Colors as Colors
 import DesignSystem.Responsive exposing (onMobile)
-import DesignSystem.Spacing as Spacing exposing (SpacingSize(..), marginBottom, marginLeft, marginRight, marginTop, padding2)
+import DesignSystem.Spacing as Spacing exposing (SpacingSize(..), marginBottom, marginLeft, marginTop, padding2)
 import DesignSystem.Typography exposing (TypographyType(..), typography)
-import Html.Styled exposing (Html, div, h2, img, li, main_, p, text, ul)
-import Html.Styled.Attributes exposing (class, css, src)
+import Html.Styled exposing (Html, a, div, h2, img, li, main_, p, text, ul)
+import Html.Styled.Attributes exposing (class, css, href, id, src)
 import Html.Styled.Events exposing (onClick)
 import List.Extra as List
 import List.Nonempty as Nonempty
@@ -19,6 +20,7 @@ import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route exposing (Route(..))
 import Spa.Page as Page exposing (Page)
 import Spa.Url exposing (Url)
+import Task
 import Utils.Html exposing (viewMaybe)
 import Utils.Time exposing (TimeAndZone)
 
@@ -58,12 +60,15 @@ type alias QuizGame =
 
 
 type State
-    = InProgress
-        { answered : List AnsweredQuestion
-        , current : Question
-        , remaining : List Question
-        }
+    = InProgress InProgressState
     | Done { results : List AnsweredQuestion }
+
+
+type alias InProgressState =
+    { answered : List AnsweredQuestion
+    , current : Question
+    , remaining : List Question
+    }
 
 
 type alias AnsweredQuestion =
@@ -101,6 +106,7 @@ load shared model =
 type Msg
     = QuizFetched (WebData Quiz)
     | AnswerQuestion Answer
+    | NoOp
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -134,43 +140,59 @@ update msg model =
             ( { model | quiz = quizStatus }, Cmd.none )
 
         AnswerQuestion answer ->
-            case model.quiz of
-                Success quizGame ->
-                    case quizGame.state of
-                        InProgress state ->
-                            let
-                                answerStatus =
-                                    if answer.isCorrect then
-                                        Correct
+            model.quiz
+                |> RemoteData.map
+                    (\quizGame ->
+                        case quizGame.state of
+                            InProgress state ->
+                                let
+                                    newState =
+                                        answerQuestion state answer
+                                in
+                                ( { model | quiz = Success { quizGame | state = newState } }, scrollTo "currentQuestion" )
 
-                                    else
-                                        Incorrect
+                            Done _ ->
+                                ( model, Cmd.none )
+                    )
+                |> RemoteData.withDefault ( model, Cmd.none )
 
-                                newState =
-                                    case state.remaining of
-                                        [] ->
-                                            Done
-                                                { results =
-                                                    { question = state.current, answerStatus = answerStatus }
-                                                        :: state.answered
-                                                        |> List.reverse
-                                                }
+        NoOp ->
+            ( model, Cmd.none )
 
-                                        first :: remaining ->
-                                            InProgress
-                                                { state
-                                                    | answered = { question = state.current, answerStatus = answerStatus } :: state.answered
-                                                    , current = first
-                                                    , remaining = remaining
-                                                }
-                            in
-                            ( { model | quiz = Success { quizGame | state = newState } }, Cmd.none )
 
-                        Done _ ->
-                            ( model, Cmd.none )
+answerQuestion : InProgressState -> Answer -> State
+answerQuestion state answer =
+    let
+        answerStatus =
+            if answer.isCorrect then
+                Correct
 
-                _ ->
-                    ( model, Cmd.none )
+            else
+                Incorrect
+    in
+    case state.remaining of
+        [] ->
+            Done
+                { results =
+                    { question = state.current, answerStatus = answerStatus }
+                        :: state.answered
+                        |> List.reverse
+                }
+
+        first :: remaining ->
+            InProgress
+                { state
+                    | answered = { question = state.current, answerStatus = answerStatus } :: state.answered
+                    , current = first
+                    , remaining = remaining
+                }
+
+
+scrollTo : String -> Cmd Msg
+scrollTo id =
+    getElement id
+        |> Task.andThen (\{ element } -> Dom.setViewport 0 element.y)
+        |> Task.attempt (always NoOp)
 
 
 subscriptions : Model -> Sub Msg
@@ -210,13 +232,14 @@ view model =
 
             NotAsked ->
                 text "Not asked"
+        , viewHomeLink
         ]
     }
 
 
 viewQuestion : Int -> Int -> Question -> Html Msg
 viewQuestion questionsCount number question =
-    div [ class "question panel" ]
+    div [ class "question panel", id "currentQuestion" ]
         [ typography Title2 p [ css [ marginBottom Spacing.M ] ] ("(" ++ String.fromInt number ++ "/" ++ String.fromInt questionsCount ++ ") " ++ question.question)
         , viewMaybe (\image -> img [ src image, class "questionImage" ] []) question.image
         , List.map viewAnswer (Nonempty.toList question.answers)
@@ -226,7 +249,13 @@ viewQuestion questionsCount number question =
 
 viewAnswer : Answer -> Html Msg
 viewAnswer answer =
-    li [ class "answer" ] [ button Secondary Large [ css [ width (pct 100) ], onClick (AnswerQuestion answer) ] [ text answer.answer ] ]
+    li [ class "answer" ]
+        [ button Secondary
+            Large
+            [ css [ width (pct 100) ], onClick (AnswerQuestion answer) ]
+            [ text answer.answer
+            ]
+        ]
 
 
 viewResult : String -> List AnsweredQuestion -> Html Msg
@@ -240,8 +269,15 @@ viewResult slug results =
                 |> Route.toString
     in
     div [ class "panel result" ]
-        [ typography Paragraph p [ css [ Spacing.marginBottom Spacing.S ] ] ("Your score: " ++ String.fromInt score ++ "/" ++ String.fromInt (List.length results))
+        [ typography HeroText p [ class "score" ] ("Votre score : " ++ String.fromInt score ++ "/" ++ String.fromInt (List.length results))
         , buttonLink Secondary Large restartRoute [] [ text "Réessayer" ]
+        ]
+
+
+viewHomeLink : Html Msg
+viewHomeLink =
+    div [ class "homeLink" ]
+        [ typography Paragraph a [ href "/" ] "< Retour"
         ]
 
 
@@ -268,7 +304,6 @@ styles =
     , Css.class "question"
         [ displayFlex
         , flexDirection column
-        , color Colors.secondary
         ]
     , Css.class "questionImage"
         [ maxWidth (pct 100)
@@ -294,5 +329,13 @@ styles =
         ]
     , Css.class "result"
         [ textAlign center
+        ]
+    , Css.class "score"
+        [ Spacing.marginBottom Spacing.S
+        ]
+    , Css.class "homeLink"
+        [ Spacing.marginTop Spacing.L
+        , Spacing.marginBottom Spacing.S
+        , textAlign center
         ]
     ]
