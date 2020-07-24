@@ -85,7 +85,7 @@ view model =
     , body =
         [ Css.global styles
         , div []
-            [ typography HeroText p [ class "catchPhrase" ] "Un nouveau quiz chaque jour !"
+            [ typography HeroText p [ class "catchPhrase" ] "Chaque jour un nouveau quiz sur les jeux de société !"
             , case model.quizPreviews of
                 Success quizPreviews ->
                     List.map (viewQuizPreview model.timeAndZone) quizPreviews |> ul [ class "quizPreviews" ]
