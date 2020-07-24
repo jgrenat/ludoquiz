@@ -28,6 +28,7 @@ jobs:
         cd front
         npm install
         npm run build
+        cp public/index.html public/404.html
 
     - name: Deploy to GitHub Pages
       uses: crazy-max/ghaction-github-pages@v2.1.1
