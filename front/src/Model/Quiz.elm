@@ -59,7 +59,7 @@ findBySlug : (WebData Quiz -> msg) -> String -> Cmd msg
 findBySlug toMsg slug =
     Http.get
         { url = "https://y3uf7k80.apicdn.sanity.io/v1/data/query/production?query=*%5B_type%20%3D%3D%20'quiz'%20%26%26%20slug.current%20%3D%3D'" ++ slug ++ "'%5D%7B_id%2C%20_createdAt%2C%20slug%2C%20title%2C%20description%2C%20%22image%22%3A%20image.asset-%3Eurl%2C%20questions%5B%5D%20%7B%20question%2C%20%22image%22%3A%20image.asset-%3Eurl%2C%20answers%7D%7D"
-        , expect = expectJson (RemoteData.fromResult >> toMsg >> Debug.log "test") (sanitySingleElementDecoder decoder)
+        , expect = expectJson (RemoteData.fromResult >> toMsg) (sanitySingleElementDecoder decoder)
         }
 
 
