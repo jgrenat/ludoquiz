@@ -35,7 +35,7 @@ jobs:
         # Build directory to deploy
         build_dir: ./front/public
         # Write the given domain name to the CNAME file
-        # fqdn: # optional
+        fqdn: ludoquiz.eu
         jekyll: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
