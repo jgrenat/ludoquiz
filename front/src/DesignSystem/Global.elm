@@ -4,7 +4,7 @@ import Css exposing (auto, backgroundColor, backgroundImage, backgroundSize, blo
 import Css.Global as Css exposing (Snippet, em)
 import DesignSystem.Button exposing (ButtonSize(..))
 import DesignSystem.Colors as Colors
-import DesignSystem.Spacing exposing (SpacingSize(..), marginBottom, padding2)
+import DesignSystem.Spacing exposing (SpacingSize(..), marginBottom, marginTop, padding2)
 import DesignSystem.Typography as FontSize exposing (FontFamily(..), fontFamily, fontSize)
 
 
@@ -24,6 +24,11 @@ styles =
         , display block
         , marginBottom M
         , Css.children [ Css.a [ textDecoration none ] ]
+        ]
+    , Css.class "footer"
+        [ textAlign center
+        , marginTop L
+        , marginBottom M
         ]
     , Css.a
         [ textDecoration underline

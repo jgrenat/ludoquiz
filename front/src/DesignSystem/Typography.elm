@@ -16,6 +16,7 @@ type TypographyType
     | MainTitleFirstPart
     | MainTitleSecondPart
     | HeroText
+    | FooterText
 
 
 type FontSize
@@ -97,6 +98,9 @@ getClassName typographyType =
         HeroText ->
             "heroText"
 
+        FooterText ->
+            "footer-text"
+
 
 getStylesFor : TypographyType -> List Style
 getStylesFor typographyType =
@@ -133,6 +137,11 @@ getStylesFor typographyType =
             , fontWeight (int 500)
             ]
 
+        FooterText ->
+            [ fontStyle italic
+            , fontSize M
+            ]
+
 
 mainTitleStyles : List Style
 mainTitleStyles =
@@ -145,5 +154,5 @@ mainTitleStyles =
 
 styles : List Css.Snippet
 styles =
-    [ Paragraph, Title1, Title2, MainTitleFirstPart, MainTitleSecondPart, DateTime, HeroText ]
+    [ Paragraph, Title1, Title2, MainTitleFirstPart, MainTitleSecondPart, DateTime, HeroText, FooterText ]
         |> List.map (\typographyType -> Css.class (getClassName typographyType) (getStylesFor typographyType))

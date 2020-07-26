@@ -12,7 +12,7 @@ import Browser.Navigation exposing (Key)
 import DesignSystem.Spacing as Spacing exposing (marginTop)
 import DesignSystem.Stylesheet exposing (stylesheet)
 import DesignSystem.Typography exposing (FontFamily(..), TypographyType(..), typography)
-import Html.Styled exposing (a, div, h1, header, span)
+import Html.Styled exposing (a, div, footer, h1, header, p, span)
 import Html.Styled.Attributes exposing (class, css, href)
 import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route
@@ -91,6 +91,12 @@ view { page, toMsg } model =
                     ]
                 ]
             , div [ css [ marginTop Spacing.M ] ] page.body
+            , footer [ class "footer" ]
+                [ p []
+                    [ typography FooterText span [] "Envie de contribuer ? "
+                    , typography FooterText a [ href "mailto:contact@ludoquiz.eu" ] "Envoyez-nous vos Ludoquiz et ils seront publiés !"
+                    ]
+                ]
             ]
         ]
     }
