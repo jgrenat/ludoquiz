@@ -91,13 +91,13 @@ view model =
                     List.map (viewQuizPreview model.timeAndZone) quizPreviews |> ul [ class "quizPreviews" ]
 
                 Failure _ ->
-                    text "An error occurred :-/"
+                    typography Paragraph p [] "Une erreur s'est produite en chargeant les ludoquiz :-/"
 
                 Loading ->
-                    text "Loading..."
+                    typography Paragraph p [] "Chargement des ludoquiz..."
 
                 NotAsked ->
-                    text "Not asked"
+                    text ""
             ]
         ]
     }
@@ -114,7 +114,7 @@ viewQuizPreview timeAndZone quizPreview =
         [ a [ href route ]
             [ div [ class "panel quizDetailsElements" ]
                 [ typography Title2 h3 [ class "quizTitle" ] quizPreview.title
-                , typography DateTime p [ class "quizTime" ] (Time.humanReadableDate timeAndZone quizPreview.createdAt)
+                , typography DateTime p [ class "quizTime" ] (Time.humanReadableDate timeAndZone quizPreview.publicationDate)
                 , node "block-content" [ class "description", property "blocks" quizPreview.description ] []
                 ]
             ]

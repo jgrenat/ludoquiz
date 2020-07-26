@@ -45,7 +45,7 @@ humanReadableDate (TimeAndZone { time, zone }) posix =
             , DateFormat.yearNumber
             ]
             zone
-            time
+            posix
 
 
 

@@ -28,7 +28,7 @@ type alias AnswerId =
 
 type alias Quiz =
     { id : QuizId
-    , createdAt : Posix
+    , publicationDate : Posix
     , slug : String
     , image : String
     , title : String
@@ -39,7 +39,7 @@ type alias Quiz =
 
 type alias QuizPreview =
     { id : Id String Quiz
-    , createdAt : Posix
+    , publicationDate : Posix
     , slug : String
     , image : String
     , title : String
@@ -58,7 +58,7 @@ type alias Answer =
 findAll : (WebData (List QuizPreview) -> msg) -> Cmd msg
 findAll toMsg =
     Http.get
-        { url = "https://y3uf7k80.apicdn.sanity.io/v1/data/query/production?query=*%5B_type%20%3D%3D%20'quiz'%5D%7Corder(_createdAt%20desc)%7B_id%2C%20_createdAt%2C%20slug%2C%20title%2C%20description%2C%20%22image%22%3A%20image.asset-%3Eurl%7D"
+        { url = "https://y3uf7k80.apicdn.sanity.io/v1/data/query/production?query=*%5B_type%20%3D%3D%20'quiz'%20%26%26%20publicationDate%20%3C%3D%20now()%5D%7Corder(publicationDate%20desc)%7B_id%2C%20publicationDate%2C%20slug%2C%20title%2C%20description%2C%20%22image%22%3A%20image.asset-%3Eurl%7D"
         , expect = expectJson (RemoteData.fromResult >> toMsg) (sanityDecoder previewDecoder)
         }
 
@@ -66,7 +66,7 @@ findAll toMsg =
 findBySlug : (WebData Quiz -> msg) -> String -> Cmd msg
 findBySlug toMsg slug =
     Http.get
-        { url = "https://y3uf7k80.apicdn.sanity.io/v1/data/query/production?query=*%5B_type%20%3D%3D%20'quiz'%20%26%26%20slug.current%20%3D%3D'" ++ slug ++ "'%5D%7B_id%2C%20_createdAt%2C%20slug%2C%20title%2C%20description%2C%20%22image%22%3A%20image.asset-%3Eurl%2C%20questions%5B%5D%20%7B%20question%2C%20%22image%22%3A%20image.asset-%3Eurl%2C%20answers%7D%7D"
+        { url = "https://y3uf7k80.apicdn.sanity.io/v1/data/query/production?query=*%5B_type%20%3D%3D%20'quiz'%20%26%26%20slug.current%20%3D%3D'" ++ slug ++ "'%5D%7B_id%2C%20publicationDate%2C%20slug%2C%20title%2C%20description%2C%20%22image%22%3A%20image.asset-%3Eurl%2C%20questions%5B%5D%20%7B%20question%2C%20%22image%22%3A%20image.asset-%3Eurl%2C%20answers%7D%7D"
         , expect = expectJson (RemoteData.fromResult >> toMsg) (sanitySingleElementDecoder decoder)
         }
 
@@ -75,7 +75,7 @@ decoder : Decoder Quiz
 decoder =
     Decode.map7 Quiz
         (Decode.field "_id" (Id.decoder Decode.string))
-        (Decode.field "_createdAt" Iso8601.decoder)
+        (Decode.field "publicationDate" Iso8601.decoder)
         (Decode.at [ "slug", "current" ] Decode.string)
         (Decode.field "image" Decode.string)
         (Decode.field "title" Decode.string)
@@ -92,7 +92,7 @@ previewDecoder : Decoder QuizPreview
 previewDecoder =
     Decode.map6 QuizPreview
         (Decode.field "_id" (Id.decoder Decode.string))
-        (Decode.field "_createdAt" Iso8601.decoder)
+        (Decode.field "publicationDate" Iso8601.decoder)
         (Decode.at [ "slug", "current" ] Decode.string)
         (Decode.field "image" Decode.string)
         (Decode.field "title" Decode.string)
