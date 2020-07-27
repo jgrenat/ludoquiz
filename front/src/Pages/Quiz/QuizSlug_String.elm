@@ -307,7 +307,7 @@ styles =
         ]
     , Css.class "questionImage"
         [ maxWidth (pct 100)
-        , maxHeight (vh 30)
+        , maxHeight (vh 50)
         , margin auto
         , display inlineBlock
         ]
