@@ -239,12 +239,21 @@ view model =
 
 viewQuestion : Int -> Int -> Question -> Html Msg
 viewQuestion questionsCount number question =
-    div [ class "question panel", id "currentQuestion" ]
-        [ typography Title2 p [ css [ marginBottom Spacing.M ] ] ("(" ++ String.fromInt number ++ "/" ++ String.fromInt questionsCount ++ ") " ++ question.question)
-        , viewMaybe (\image -> img [ src image, class "questionImage" ] []) question.image
-        , List.map viewAnswer (Nonempty.toList question.answers)
-            |> ul [ class "answers" ]
-        ]
+    let
+        questionView =
+            div [ class "question panel", id "currentQuestion" ]
+                [ typography Title2 p [ css [ marginBottom Spacing.M ] ] ("(" ++ String.fromInt number ++ "/" ++ String.fromInt questionsCount ++ ") " ++ question.question)
+                , viewMaybe (\image -> img [ src image, class "questionImage" ] []) question.image
+                , List.map viewAnswer (Nonempty.toList question.answers)
+                    |> ul [ class "answers" ]
+                ]
+    in
+    -- Add a div each two questions to avoid the `hover` effect to stay on mobile
+    if modBy 2 number == 0 then
+        questionView
+
+    else
+        div [] [ questionView ]
 
 
 viewAnswer : Answer -> Html Msg
