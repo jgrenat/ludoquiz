@@ -11,6 +11,8 @@ import DesignSystem.Typography exposing (TypographyType(..), typography)
 import Html.Styled exposing (Html, a, div, h2, img, li, main_, p, text, ul)
 import Html.Styled.Attributes exposing (class, css, href, id, src)
 import Html.Styled.Events exposing (onClick)
+import Html.Styled.Keyed as Keyed
+import Id
 import List.Extra as List
 import List.Nonempty as Nonempty
 import Model.Quiz as Quiz exposing (Answer, Question, Quiz)
@@ -239,21 +241,13 @@ view model =
 
 viewQuestion : Int -> Int -> Question -> Html Msg
 viewQuestion questionsCount number question =
-    let
-        questionView =
-            div [ class "question panel", id "currentQuestion" ]
-                [ typography Title2 p [ css [ marginBottom Spacing.M ] ] ("(" ++ String.fromInt number ++ "/" ++ String.fromInt questionsCount ++ ") " ++ question.question)
-                , viewMaybe (\image -> img [ src image, class "questionImage" ] []) question.image
-                , List.map viewAnswer (Nonempty.toList question.answers)
-                    |> ul [ class "answers" ]
-                ]
-    in
-    -- Add a div each two questions to avoid the `hover` effect to stay on mobile
-    if modBy 2 number == 0 then
-        questionView
-
-    else
-        div [] [ questionView ]
+    div [ class "question panel", id "currentQuestion" ]
+        [ typography Title2 p [ css [ marginBottom Spacing.M ] ] ("(" ++ String.fromInt number ++ "/" ++ String.fromInt questionsCount ++ ") " ++ question.question)
+        , viewMaybe (\image -> img [ src image, class "questionImage" ] []) question.image
+        , Nonempty.toList question.answers
+            |> List.map (\answer -> ( Id.to answer.id, viewAnswer answer ))
+            |> Keyed.ul [ class "answers" ]
+        ]
 
 
 viewAnswer : Answer -> Html Msg
