@@ -8,8 +8,10 @@ import DesignSystem.Spacing as Spacing exposing (marginTop)
 import DesignSystem.Typography exposing (TypographyType(..), typography)
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (alt, class, href, property, src, target)
+import Html.Styled.Events exposing (onClick)
 import List.Extra as List
 import Model.Quiz as Quiz exposing (QuizPreview)
+import Ports
 import RemoteData exposing (RemoteData(..), WebData)
 import Shared
 import Spa.Document exposing (Document)
@@ -78,6 +80,7 @@ load shared model =
 
 type Msg
     = QuizFetched (WebData (List QuizPreview))
+    | PhilibertBannerClicked
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -85,6 +88,9 @@ update msg model =
     case msg of
         QuizFetched quizPreviewsData ->
             ( { model | quizPreviews = quizPreviewsData }, Cmd.none )
+
+        PhilibertBannerClicked ->
+            ( model, Ports.logEvent "PhilibertBannerClicked" )
 
 
 subscriptions : Model -> Sub Msg
@@ -166,7 +172,7 @@ viewBanner =
             "Cliquez ici pour accéder aux nombreux jeux disponibles sur Philibert !"
     in
     li [ class "banner" ]
-        [ a [ href philibertLink, target "_blank" ]
+        [ a [ href philibertLink, target "_blank", onClick PhilibertBannerClicked ]
             [ img [ class "banner--desktop", src philibertBannerUrl, alt alternativeText ] []
             , img [ class "banner--mobile", src philibertMobileBannerUrl, alt alternativeText ] []
             ]
