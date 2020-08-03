@@ -1,12 +1,13 @@
 module Pages.Top exposing (Model, Msg, Params, page)
 
-import Css exposing (backgroundColor, center, color, displayFlex, flexWrap, justifyContent, none, pct, spaceBetween, textAlign, textDecoration, width, wrap)
+import Css exposing (borderRadius, center, color, displayFlex, flexWrap, hidden, justifyContent, none, overflow, pct, px, spaceBetween, textAlign, textDecoration, width, wrap)
 import Css.Global as Css exposing (Snippet)
 import DesignSystem.Colors as Colors
 import DesignSystem.Spacing as Spacing exposing (marginTop)
 import DesignSystem.Typography exposing (TypographyType(..), typography)
 import Html.Styled exposing (..)
-import Html.Styled.Attributes exposing (class, href, property)
+import Html.Styled.Attributes exposing (class, href, property, src)
+import List.Extra as List
 import Model.Quiz as Quiz exposing (QuizPreview)
 import RemoteData exposing (RemoteData(..), WebData)
 import Shared
@@ -15,6 +16,16 @@ import Spa.Generated.Route as Route exposing (Route(..))
 import Spa.Page as Page exposing (Page)
 import Spa.Url exposing (Url)
 import Utils.Time as Time exposing (TimeAndZone)
+
+
+philibertLink : String
+philibertLink =
+    "https://www.philibertnet.com/fr/#ae356-12"
+
+
+philibertBannerUrl : String
+philibertBannerUrl =
+    "https://lb.affilae.com/imp/5bf52e77e2891d7d00f2e8af/5f1fece020fada696401c689/5e135681b53a17179f2aeaa1/https://s3-eu-west-1.amazonaws.com/aeup/uploads/programs/5bf52e77e2891d7d00f2e8af/elements/5e135681b53a17179f2aea9f.jpg"
 
 
 page : Page Params Model Msg
@@ -79,6 +90,11 @@ subscriptions _ =
 -- VIEW
 
 
+type QuizListElement
+    = QuizElement QuizPreview
+    | BannerElement
+
+
 view : Model -> Document Msg
 view model =
     { title = "LudoQuiz"
@@ -88,7 +104,23 @@ view model =
             [ typography HeroText p [ class "catchPhrase" ] "Chaque jour un nouveau quiz sur les jeux de société !"
             , case model.quizPreviews of
                 Success quizPreviews ->
-                    List.map (viewQuizPreview model.timeAndZone) quizPreviews |> ul [ class "quizPreviews" ]
+                    let
+                        quizListWithBanners =
+                            List.map QuizElement quizPreviews
+                                |> List.greedyGroupsOf 5
+                                |> List.intercalate [ BannerElement ]
+                    in
+                    List.map
+                        (\element ->
+                            case element of
+                                QuizElement quizPreview ->
+                                    viewQuizPreview model.timeAndZone quizPreview
+
+                                BannerElement ->
+                                    viewBanner
+                        )
+                        quizListWithBanners
+                        |> ul [ class "quizPreviews" ]
 
                 Failure _ ->
                     typography Paragraph p [] "Une erreur s'est produite en chargeant les ludoquiz :-/"
@@ -121,14 +153,27 @@ viewQuizPreview timeAndZone quizPreview =
         ]
 
 
-
--- STYLES
+viewBanner : Html Msg
+viewBanner =
+    li [ class "banner" ]
+        [ a [ href philibertLink ]
+            [ img [ src philibertBannerUrl ] [] ]
+        ]
 
 
 styles : List Snippet
 styles =
     [ Css.class "catchPhrase"
         [ textAlign center ]
+    , Css.class "banner"
+        [ marginTop Spacing.M
+        , borderRadius (px 10)
+        , overflow hidden
+        , Css.descendants
+            [ Css.a [ textDecoration none ]
+            , Css.img [ width (pct 100) ]
+            ]
+        ]
     , Css.class "quizDetails"
         [ marginTop Spacing.M
         , Css.children [ Css.a [ textDecoration none ] ]
