@@ -3,7 +3,7 @@ module DesignSystem.Typography exposing (FontFamily(..), FontSize(..), Typograph
 import Css exposing (..)
 import Css.Global as Css
 import DesignSystem.Colors as Colors
-import DesignSystem.Responsive exposing (onMobile)
+import DesignSystem.Responsive exposing (onSmallScreen)
 import Html.Styled as Html exposing (Attribute, Html, text)
 import Html.Styled.Attributes exposing (class)
 
@@ -148,7 +148,7 @@ mainTitleStyles =
     [ fontSize XXL
     , fontWeight (int 900)
     , fontFamily MainTitleFont
-    , onMobile [ fontSize XL ]
+    , onSmallScreen [ fontSize XL ]
     ]
 
 

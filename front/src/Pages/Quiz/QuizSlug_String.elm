@@ -5,7 +5,7 @@ import Css exposing (alignItems, auto, center, color, column, display, displayFl
 import Css.Global as Css exposing (Snippet)
 import DesignSystem.Button exposing (ButtonSize(..), ButtonType(..), button, buttonLink)
 import DesignSystem.Colors as Colors
-import DesignSystem.Responsive exposing (onMobile)
+import DesignSystem.Responsive exposing (onSmallScreen)
 import DesignSystem.Spacing as Spacing exposing (SpacingSize(..), marginBottom, marginLeft, marginTop, padding2)
 import DesignSystem.Typography exposing (TypographyType(..), typography)
 import Html.Styled exposing (Html, a, div, h2, img, li, main_, p, text, ul)
@@ -326,7 +326,7 @@ styles =
                 , alignItems center
                 , padding2 Spacing.S Spacing.M
                 , width (pct 50)
-                , onMobile [ width (pct 100) ]
+                , onSmallScreen [ width (pct 100) ]
                 ]
             ]
         ]

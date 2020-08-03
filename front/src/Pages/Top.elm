@@ -1,8 +1,9 @@
 module Pages.Top exposing (Model, Msg, Params, page)
 
-import Css exposing (borderRadius, center, color, displayFlex, flexWrap, hidden, justifyContent, none, overflow, pct, px, spaceBetween, textAlign, textDecoration, width, wrap)
+import Css exposing (borderRadius, center, color, display, displayFlex, flexWrap, hidden, inline, justifyContent, maxWidth, none, overflow, pct, px, spaceBetween, textAlign, textDecoration, width, wrap)
 import Css.Global as Css exposing (Snippet)
 import DesignSystem.Colors as Colors
+import DesignSystem.Responsive exposing (onMobile, onSmallScreen)
 import DesignSystem.Spacing as Spacing exposing (marginTop)
 import DesignSystem.Typography exposing (TypographyType(..), typography)
 import Html.Styled exposing (..)
@@ -26,6 +27,11 @@ philibertLink =
 philibertBannerUrl : String
 philibertBannerUrl =
     "https://lb.affilae.com/imp/5bf52e77e2891d7d00f2e8af/5f1fece020fada696401c689/5e135681b53a17179f2aeaa1/https://s3-eu-west-1.amazonaws.com/aeup/uploads/programs/5bf52e77e2891d7d00f2e8af/elements/5e135681b53a17179f2aea9f.jpg"
+
+
+philibertMobileBannerUrl : String
+philibertMobileBannerUrl =
+    "https://lb.affilae.com/imp/5bf52e77e2891d7d00f2e8af/5f1fece020fada696401c689/5e135b4cb53a17179f2aefc5/https://s3-eu-west-1.amazonaws.com/aeup/uploads/programs/5bf52e77e2891d7d00f2e8af/elements/5e135b4cb53a17179f2aefc3.jpg"
 
 
 page : Page Params Model Msg
@@ -157,7 +163,9 @@ viewBanner : Html Msg
 viewBanner =
     li [ class "banner" ]
         [ a [ href philibertLink ]
-            [ img [ src philibertBannerUrl ] [] ]
+            [ img [ class "banner--desktop", src philibertBannerUrl ] []
+            , img [ class "banner--mobile", src philibertMobileBannerUrl ] []
+            ]
         ]
 
 
@@ -169,9 +177,22 @@ styles =
         [ marginTop Spacing.M
         , borderRadius (px 10)
         , overflow hidden
+        , textAlign center
         , Css.descendants
             [ Css.a [ textDecoration none ]
-            , Css.img [ width (pct 100) ]
+            , Css.class "banner--desktop"
+                [ width (pct 100)
+                , onMobile
+                    [ display none
+                    ]
+                ]
+            , Css.class "banner--mobile"
+                [ display none
+                , maxWidth (pct 100)
+                , onMobile
+                    [ display inline
+                    ]
+                ]
             ]
         ]
     , Css.class "quizDetails"
