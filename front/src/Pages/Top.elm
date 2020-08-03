@@ -3,7 +3,7 @@ module Pages.Top exposing (Model, Msg, Params, page)
 import Css exposing (borderRadius, center, color, display, displayFlex, flexWrap, hidden, inline, justifyContent, maxWidth, none, overflow, pct, px, spaceBetween, textAlign, textDecoration, width, wrap)
 import Css.Global as Css exposing (Snippet)
 import DesignSystem.Colors as Colors
-import DesignSystem.Responsive exposing (onMobile, onSmallScreen)
+import DesignSystem.Responsive exposing (onSmallScreen)
 import DesignSystem.Spacing as Spacing exposing (marginTop)
 import DesignSystem.Typography exposing (TypographyType(..), typography)
 import Html.Styled exposing (..)
@@ -163,7 +163,7 @@ viewBanner : Html Msg
 viewBanner =
     let
         alternativeText =
-            "De nombreux jeux disponibles sur Philibert ! Cliquez ici"
+            "Cliquez ici pour accéder aux nombreux jeux disponibles sur Philibert !"
     in
     li [ class "banner" ]
         [ a [ href philibertLink, target "_blank" ]
@@ -186,14 +186,14 @@ styles =
             [ Css.a [ textDecoration none ]
             , Css.class "banner--desktop"
                 [ width (pct 100)
-                , onMobile
+                , onSmallScreen
                     [ display none
                     ]
                 ]
             , Css.class "banner--mobile"
                 [ display none
                 , maxWidth (pct 100)
-                , onMobile
+                , onSmallScreen
                     [ display inline
                     ]
                 ]
