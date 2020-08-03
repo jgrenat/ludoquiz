@@ -26,12 +26,12 @@ philibertLink =
 
 philibertBannerUrl : String
 philibertBannerUrl =
-    "https://lb.affilae.com/imp/5bf52e77e2891d7d00f2e8af/5f1fece020fada696401c689/5e135681b53a17179f2aeaa1/https://s3-eu-west-1.amazonaws.com/aeup/uploads/programs/5bf52e77e2891d7d00f2e8af/elements/5e135681b53a17179f2aea9f.jpg"
+    "/images/banner-philibert-desktop.jpg"
 
 
 philibertMobileBannerUrl : String
 philibertMobileBannerUrl =
-    "https://lb.affilae.com/imp/5bf52e77e2891d7d00f2e8af/5f1fece020fada696401c689/5e135b4cb53a17179f2aefc5/https://s3-eu-west-1.amazonaws.com/aeup/uploads/programs/5bf52e77e2891d7d00f2e8af/elements/5e135b4cb53a17179f2aefc3.jpg"
+    "/images/banner-philibert-mobile.jpg"
 
 
 page : Page Params Model Msg
