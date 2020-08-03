@@ -7,7 +7,7 @@ import DesignSystem.Responsive exposing (onMobile, onSmallScreen)
 import DesignSystem.Spacing as Spacing exposing (marginTop)
 import DesignSystem.Typography exposing (TypographyType(..), typography)
 import Html.Styled exposing (..)
-import Html.Styled.Attributes exposing (class, href, property, src, target)
+import Html.Styled.Attributes exposing (alt, class, href, property, src, target)
 import List.Extra as List
 import Model.Quiz as Quiz exposing (QuizPreview)
 import RemoteData exposing (RemoteData(..), WebData)
@@ -161,10 +161,14 @@ viewQuizPreview timeAndZone quizPreview =
 
 viewBanner : Html Msg
 viewBanner =
+    let
+        alternativeText =
+            "De nombreux jeux disponibles sur Philibert ! Cliquez ici"
+    in
     li [ class "banner" ]
         [ a [ href philibertLink, target "_blank" ]
-            [ img [ class "banner--desktop", src philibertBannerUrl ] []
-            , img [ class "banner--mobile", src philibertMobileBannerUrl ] []
+            [ img [ class "banner--desktop", src philibertBannerUrl, alt alternativeText ] []
+            , img [ class "banner--mobile", src philibertMobileBannerUrl, alt alternativeText ] []
             ]
         ]
 
