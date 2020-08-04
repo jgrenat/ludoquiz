@@ -157,7 +157,7 @@ viewQuizPreview timeAndZone quizPreview =
     li [ class "quizDetails" ]
         [ a [ href route ]
             [ div [ class "panel quizDetailsElements" ]
-                [ typography Title2 h3 [ class "quizTitle" ] quizPreview.title
+                [ typography Title2 h2 [ class "quizTitle" ] quizPreview.title
                 , typography DateTime p [ class "quizTime" ] (Time.humanReadableDate timeAndZone quizPreview.publicationDate)
                 , node "block-content" [ class "description", property "blocks" quizPreview.description ] []
                 ]

@@ -16,6 +16,7 @@ import Id
 import List.Extra as List
 import List.Nonempty as Nonempty
 import Model.Quiz as Quiz exposing (Answer, Question, Quiz)
+import Ports
 import RemoteData exposing (RemoteData(..), WebData)
 import Shared
 import Spa.Document exposing (Document)
@@ -151,7 +152,9 @@ update msg model =
                                     newState =
                                         answerQuestion state answer
                                 in
-                                ( { model | quiz = Success { quizGame | state = newState } }, scrollTo "currentQuestion" )
+                                ( { model | quiz = Success { quizGame | state = newState } }
+                                , Cmd.batch [ scrollTo "currentQuestion", logQuizCompletedIfNeeded newState ]
+                                )
 
                             Done _ ->
                                 ( model, Cmd.none )
@@ -188,6 +191,16 @@ answerQuestion state answer =
                     , current = first
                     , remaining = remaining
                 }
+
+
+logQuizCompletedIfNeeded : State -> Cmd Msg
+logQuizCompletedIfNeeded state =
+    case state of
+        InProgress _ ->
+            Cmd.none
+
+        Done _ ->
+            Ports.logEvent "QuizCompleted"
 
 
 scrollTo : String -> Cmd Msg
