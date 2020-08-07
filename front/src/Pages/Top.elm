@@ -161,7 +161,17 @@ viewQuizPreview sharedModel quizPreview =
                 [ typography Title2 h2 [ class "quizTitle" ] quizPreview.title
                 , typography DateTime p [ class "quizTime" ] (Time.humanReadableDate sharedModel.timeAndZone quizPreview.publicationDate)
                 , viewMaybe
-                    (\score -> typography QuizBestResult p [ class "quizBestResult" ] ("Votre meilleur score à ce LudoQuiz : " ++ String.fromInt score ++ "/" ++ String.fromInt quizPreview.questionsCount))
+                    (\score ->
+                        let
+                            toDisplay =
+                                if score >= quizPreview.questionsCount then
+                                    "✔︎ Vous avez réussi ce LudoQuiz !"
+
+                                else
+                                    "Meilleur score : " ++ String.fromInt score ++ "/" ++ String.fromInt quizPreview.questionsCount
+                        in
+                        typography QuizBestResult p [ class "quizBestResult" ] toDisplay
+                    )
                     (getResultForQuiz sharedModel quizPreview.id)
                 , node "block-content" [ class "description", property "blocks" quizPreview.description ] []
                 ]
