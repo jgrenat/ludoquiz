@@ -1,4 +1,4 @@
-module Model.Quiz exposing (Answer, Question, Quiz, QuizPreview, findAll, findBySlug)
+module Model.Quiz exposing (Answer, Question, Quiz, QuizId, QuizPreview, findAll, findBySlug)
 
 import Http exposing (expectJson)
 import Id exposing (Id(..))
@@ -38,12 +38,13 @@ type alias Quiz =
 
 
 type alias QuizPreview =
-    { id : Id String Quiz
+    { id : QuizId
     , publicationDate : Posix
     , slug : String
     , image : String
     , title : String
     , description : Encode.Value
+    , questionsCount : Int
     }
 
 
@@ -58,7 +59,7 @@ type alias Answer =
 findAll : (WebData (List QuizPreview) -> msg) -> Cmd msg
 findAll toMsg =
     Http.get
-        { url = "https://y3uf7k80.apicdn.sanity.io/v1/data/query/production?query=*%5B_type%20%3D%3D%20'quiz'%20%26%26%20publicationDate%20%3C%3D%20now()%5D%7Corder(publicationDate%20desc)%7B_id%2C%20publicationDate%2C%20slug%2C%20title%2C%20description%2C%20%22image%22%3A%20image.asset-%3Eurl%7D"
+        { url = "https://y3uf7k80.apicdn.sanity.io/v1/data/query/production?query=*%5B_type%20%3D%3D%20'quiz'%20%26%26%20publicationDate%20%3C%3D%20now()%5D%0A%7C%20order(publicationDate%20desc)%0A%7B_id%2C%20publicationDate%2C%20slug%2C%20title%2C%20description%2C%20%22image%22%3A%20image.asset-%3Eurl%2C%20%22questionsCount%22%3A%20count(questions)%7D"
         , expect = expectJson (RemoteData.fromResult >> toMsg) (sanityDecoder previewDecoder)
         }
 
@@ -90,13 +91,14 @@ nonemptyLisDecoder decoder_ =
 
 previewDecoder : Decoder QuizPreview
 previewDecoder =
-    Decode.map6 QuizPreview
+    Decode.map7 QuizPreview
         (Decode.field "_id" (Id.decoder Decode.string))
         (Decode.field "publicationDate" Iso8601.decoder)
         (Decode.at [ "slug", "current" ] Decode.string)
         (Decode.field "image" Decode.string)
         (Decode.field "title" Decode.string)
         (Decode.field "description" Decode.value)
+        (Decode.field "questionsCount" Decode.int)
 
 
 sanitySingleElementDecoder : Decoder a -> Decoder a

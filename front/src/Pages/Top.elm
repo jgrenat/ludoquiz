@@ -13,11 +13,12 @@ import List.Extra as List
 import Model.Quiz as Quiz exposing (QuizPreview)
 import Ports
 import RemoteData exposing (RemoteData(..), WebData)
-import Shared
+import Shared exposing (getResultForQuiz)
 import Spa.Document exposing (Document)
 import Spa.Generated.Route as Route exposing (Route(..))
 import Spa.Page as Page exposing (Page)
 import Spa.Url exposing (Url)
+import Utils.Html exposing (viewMaybe)
 import Utils.Time as Time exposing (TimeAndZone)
 
 
@@ -58,18 +59,18 @@ type alias Params =
 
 type alias Model =
     { quizPreviews : WebData (List QuizPreview)
-    , timeAndZone : TimeAndZone
+    , sharedModel : Shared.Model
     }
 
 
 init : Shared.Model -> Url Params -> ( Model, Cmd Msg )
-init { timeAndZone } { params } =
-    ( { quizPreviews = Loading, timeAndZone = timeAndZone }, Quiz.findAll QuizFetched )
+init sharedModel { params } =
+    ( { quizPreviews = Loading, sharedModel = sharedModel }, Quiz.findAll QuizFetched )
 
 
 load : Shared.Model -> Model -> ( Model, Cmd Msg )
-load shared model =
-    ( { model | timeAndZone = shared.timeAndZone }
+load sharedModel model =
+    ( { model | sharedModel = sharedModel }
     , Cmd.none
     )
 
@@ -126,7 +127,7 @@ view model =
                         (\element ->
                             case element of
                                 QuizElement quizPreview ->
-                                    viewQuizPreview model.timeAndZone quizPreview
+                                    viewQuizPreview model.sharedModel quizPreview
 
                                 BannerElement ->
                                     viewBanner
@@ -147,8 +148,8 @@ view model =
     }
 
 
-viewQuizPreview : TimeAndZone -> QuizPreview -> Html Msg
-viewQuizPreview timeAndZone quizPreview =
+viewQuizPreview : Shared.Model -> QuizPreview -> Html Msg
+viewQuizPreview sharedModel quizPreview =
     let
         route =
             Quiz__QuizSlug_String { quizSlug = quizPreview.slug }
@@ -158,7 +159,10 @@ viewQuizPreview timeAndZone quizPreview =
         [ a [ href route ]
             [ div [ class "panel quizDetailsElements" ]
                 [ typography Title2 h2 [ class "quizTitle" ] quizPreview.title
-                , typography DateTime p [ class "quizTime" ] (Time.humanReadableDate timeAndZone quizPreview.publicationDate)
+                , typography DateTime p [ class "quizTime" ] (Time.humanReadableDate sharedModel.timeAndZone quizPreview.publicationDate)
+                , viewMaybe
+                    (\score -> typography QuizBestResult p [ class "quizBestResult" ] ("Votre meilleur score à ce LudoQuiz : " ++ String.fromInt score ++ "/" ++ String.fromInt quizPreview.questionsCount))
+                    (getResultForQuiz sharedModel quizPreview.id)
                 , node "block-content" [ class "description", property "blocks" quizPreview.description ] []
                 ]
             ]
@@ -219,6 +223,10 @@ styles =
         ]
     , Css.class "quizTime"
         [ color Colors.secondary
+        ]
+    , Css.class "quizBestResult"
+        [ width (pct 100)
+        , marginTop Spacing.XS
         ]
     , Css.class "description"
         [ width (pct 100)

@@ -14,7 +14,8 @@ import Html.Styled.Keyed as Keyed
 import Id
 import List.Extra as List
 import List.Nonempty as Nonempty
-import Model.Quiz as Quiz exposing (Answer, Question, Quiz)
+import Model.Quiz as Quiz exposing (Answer, Question, Quiz, QuizId)
+import Model.Result as Result exposing (Result)
 import Ports
 import RemoteData exposing (RemoteData(..), WebData)
 import Shared
@@ -55,7 +56,8 @@ type alias Model =
 
 
 type alias QuizGame =
-    { title : String
+    { id : QuizId
+    , title : String
     , image : String
     , state : State
     }
@@ -120,7 +122,8 @@ update msg model =
                     case quizData of
                         Success quiz ->
                             Success
-                                { title = quiz.title
+                                { id = quiz.id
+                                , title = quiz.title
                                 , image = quiz.image
                                 , state =
                                     InProgress
@@ -152,7 +155,11 @@ update msg model =
                                         answerQuestion state answer
                                 in
                                 ( { model | quiz = Success { quizGame | state = newState } }
-                                , Cmd.batch [ scrollTo "currentQuestion", logQuizCompletedIfNeeded newState ]
+                                , Cmd.batch
+                                    [ scrollTo "currentQuestion"
+                                    , logQuizCompletedIfNeeded newState
+                                    , saveScoreIfNeeded quizGame.id newState
+                                    ]
                                 )
 
                             Done _ ->
@@ -200,6 +207,21 @@ logQuizCompletedIfNeeded state =
 
         Done _ ->
             Ports.logEvent "QuizCompleted"
+
+
+saveScoreIfNeeded : QuizId -> State -> Cmd msg
+saveScoreIfNeeded id state =
+    case state of
+        InProgress _ ->
+            Cmd.none
+
+        Done { results } ->
+            let
+                score =
+                    List.count (\answeredQuestion -> answeredQuestion.answerStatus == Correct) results
+            in
+            Result.encode (Result id score)
+                |> Ports.storeResult
 
 
 scrollTo : String -> Cmd Msg
