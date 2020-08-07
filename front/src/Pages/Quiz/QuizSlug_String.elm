@@ -254,12 +254,17 @@ view model =
 
 viewQuestion : Int -> Int -> Question -> Html Msg
 viewQuestion questionsCount number question =
-    div [ class "question panel", id "currentQuestion" ]
-        [ typography Title2 p [ css [ marginBottom Spacing.M ] ] ("(" ++ String.fromInt number ++ "/" ++ String.fromInt questionsCount ++ ") " ++ question.question)
-        , viewMaybe (\image -> img [ src image, class "questionImage" ] []) question.image
-        , Nonempty.toList question.answers
-            |> List.map (\answer -> ( Id.to answer.id, viewAnswer answer ))
-            |> Keyed.ul [ class "answers" ]
+    Keyed.node "div"
+        []
+        [ ( String.fromInt number
+          , div [ class "question panel", id "currentQuestion" ]
+                [ typography Title2 p [ css [ marginBottom Spacing.M ] ] ("(" ++ String.fromInt number ++ "/" ++ String.fromInt questionsCount ++ ") " ++ question.question)
+                , viewMaybe (\image -> img [ src image, class "questionImage" ] []) question.image
+                , Nonempty.toList question.answers
+                    |> List.map (\answer -> ( Id.to answer.id, viewAnswer answer ))
+                    |> Keyed.ul [ class "answers" ]
+                ]
+          )
         ]
 
 
