@@ -1,14 +1,13 @@
 module Pages.Quiz.QuizSlug_String exposing (Model, Msg, Params, page)
 
 import Browser.Dom as Dom exposing (getElement)
-import Css exposing (alignItems, auto, center, color, column, display, displayFlex, flexDirection, flexGrow, flexWrap, inlineBlock, int, justifyContent, margin, maxHeight, maxWidth, none, pct, px, spaceAround, stretch, textAlign, textDecoration, vh, width, wrap)
+import Css exposing (alignItems, auto, center, column, display, displayFlex, flexDirection, flexGrow, flexWrap, inlineBlock, int, justifyContent, margin, maxHeight, maxWidth, pct, px, spaceAround, stretch, textAlign, vh, width, wrap)
 import Css.Global as Css exposing (Snippet)
 import DesignSystem.Button exposing (ButtonSize(..), ButtonType(..), button, buttonLink)
-import DesignSystem.Colors as Colors
 import DesignSystem.Responsive exposing (onSmallScreen)
 import DesignSystem.Spacing as Spacing exposing (SpacingSize(..), marginBottom, marginLeft, marginTop, padding2)
 import DesignSystem.Typography exposing (TypographyType(..), typography)
-import Html.Styled exposing (Html, a, div, h2, img, li, main_, p, text, ul)
+import Html.Styled exposing (Html, a, div, h2, img, li, main_, p, text)
 import Html.Styled.Attributes exposing (class, css, href, id, src)
 import Html.Styled.Events exposing (onClick)
 import Html.Styled.Keyed as Keyed
@@ -211,7 +210,7 @@ scrollTo id =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.none
 
 
@@ -290,9 +289,45 @@ viewResult slug results =
                 |> Route.toString
     in
     div [ class "panel result" ]
-        [ typography HeroText p [ class "score" ] ("Votre score : " ++ String.fromInt score ++ "/" ++ String.fromInt (List.length results))
+        [ viewResultComment results
+        , typography HeroText p [ class "score", css [ marginTop L ] ] ("Votre score : " ++ String.fromInt score ++ "/" ++ String.fromInt (List.length results))
         , buttonLink Secondary Large restartRoute [] [ text "Réessayer" ]
         ]
+
+
+viewResultComment : List AnsweredQuestion -> Html Msg
+viewResultComment results =
+    let
+        correctAnswersCount =
+            List.count (\answeredQuestion -> answeredQuestion.answerStatus == Correct) results
+
+        questionsCount =
+            List.length results
+
+        ratio =
+            if questionsCount == 0 then
+                0
+
+            else
+                toFloat correctAnswersCount / toFloat questionsCount
+    in
+    if ratio < 0.2 then
+        typography HeroText div [] "\u{1F97A} Je suis sûr que vous pouvez faire mieux ! On retente ?"
+
+    else if ratio < 0.4 then
+        typography HeroText div [] "😕 Pas terrible... Heureusement, vous avez le droit à une seconde chance !"
+
+    else if ratio < 0.6 then
+        typography HeroText div [] "🙂 Quelques lacunes, mais c'est un bon début !"
+
+    else if ratio < 0.8 then
+        typography HeroText div [] "👍 Pas mal ! Retentez ce LudoQuiz pour améliorer votre score !"
+
+    else if ratio < 1 then
+        typography HeroText div [] "🎉 Excellent ! Vous êtes prêt à tenter le perfect !"
+
+    else
+        typography HeroText div [] "🏆 Félicitations, c'est un sans faute ! Il est temps de relever nos autres LudoQuiz !"
 
 
 viewHomeLink : Html Msg
