@@ -1,6 +1,6 @@
 module DesignSystem.Global exposing (styles)
 
-import Css exposing (auto, backgroundColor, backgroundImage, backgroundSize, block, borderRadius, boxShadow, boxShadow5, center, contain, cover, display, fontStyle, fontWeight, height, int, italic, margin, maxWidth, minHeight, none, pct, px, rgba, textAlign, textDecoration, underline, url, width)
+import Css exposing (auto, backgroundAttachment, backgroundColor, backgroundImage, backgroundPosition, backgroundSize, block, borderRadius, boxShadow, boxShadow5, center, contain, cover, display, fixed, fontStyle, fontWeight, height, int, italic, margin, maxWidth, minHeight, none, pct, px, rgba, textAlign, textDecoration, underline, url, width)
 import Css.Global as Css exposing (Snippet, em)
 import DesignSystem.Button exposing (ButtonSize(..))
 import DesignSystem.Colors as Colors
@@ -18,6 +18,7 @@ styles =
         , fontFamily Lato
         , backgroundImage (url "/images/background.svg")
         , backgroundSize cover
+        , backgroundAttachment fixed
         ]
     , Css.header
         [ textAlign center
