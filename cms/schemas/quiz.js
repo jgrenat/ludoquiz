@@ -9,7 +9,8 @@ export default {
     {
       name: 'title',
       title: 'Title',
-      type: 'string'
+      type: 'string',
+      validation: Rule => Rule.required()
     },
     {
       name: 'slug',
@@ -18,28 +19,33 @@ export default {
       options: {
         source: 'title',
         maxLength: 100
-      }
+      },
+      validation: Rule => Rule.required()
     },
     {
       title: 'Publication date',
       name: 'publicationDate',
-      type: 'datetime'
+      type: 'datetime',
+      validation: Rule => Rule.required()
     },
     {
       name: 'image',
       title: 'Image',
-      type: 'image'
+      type: 'image',
+      validation: Rule => Rule.required()
     },
     {
       name: 'description',
       title: 'Description',
-      type: 'blockContent'
+      type: 'blockContent',
+      validation: Rule => Rule.required()
     },
     {
       name: 'questions',
       title: 'Questions',
       type: 'array',
-      of: [{type: 'question'}]
+      of: [{type: 'question'}],
+      validation: Rule => Rule.required().min(2)
     },
   ]
 }
