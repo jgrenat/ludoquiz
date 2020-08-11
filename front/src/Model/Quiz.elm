@@ -59,7 +59,7 @@ type alias Answer =
 findAll : (WebData (List QuizPreview) -> msg) -> Cmd msg
 findAll toMsg =
     Http.get
-        { url = "https://y3uf7k80.apicdn.sanity.io/v1/data/query/production?query=*%5B_type%20%3D%3D%20'quiz'%20%26%26%20publicationDate%20%3C%3D%20now()%5D%0A%7C%20order(publicationDate%20desc)%0A%7B_id%2C%20publicationDate%2C%20slug%2C%20title%2C%20description%2C%20%22image%22%3A%20image.asset-%3Eurl%2C%20%22questionsCount%22%3A%20count(questions)%7D"
+        { url = "https://y3uf7k80.apicdn.sanity.io/v1/data/query/production?query=*%5B_type%20%3D%3D%20'quiz'%20%26%26%20publicationDate%20!%3D%20null%20%26%26%20dateTime(publicationDate)%20%3C%3D%20dateTime(now())%5D%0A%7C%20order(publicationDate%20desc)%0A%7B_id%2C%20publicationDate%2C%20slug%2C%20title%2C%20description%2C%20%22image%22%3A%20image.asset-%3Eurl%2C%20%22questionsCount%22%3A%20count(questions)%7D"
         , expect = expectJson (RemoteData.fromResult >> toMsg) (sanityDecoder previewDecoder)
         }
 

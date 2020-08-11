@@ -5,6 +5,7 @@ import Css exposing (alignItems, auto, center, column, display, displayFlex, fle
 import Css.Global as Css exposing (Snippet)
 import DesignSystem.Button exposing (ButtonSize(..), ButtonType(..), button, buttonLink)
 import DesignSystem.Responsive exposing (onSmallScreen)
+import DesignSystem.SanityImage exposing (sanityImage)
 import DesignSystem.Spacing as Spacing exposing (SpacingSize(..), marginBottom, marginLeft, marginTop, padding2)
 import DesignSystem.Typography exposing (TypographyType(..), typography)
 import Html.Styled exposing (Html, a, div, h2, img, li, main_, p, text)
@@ -25,7 +26,6 @@ import Spa.Page as Page exposing (Page)
 import Spa.Url exposing (Url)
 import Task
 import Utils.Html exposing (viewMaybe)
-import Utils.Time exposing (TimeAndZone)
 
 
 page : Page Params Model Msg
@@ -51,7 +51,7 @@ type alias Params =
 type alias Model =
     { slug : String
     , quiz : WebData QuizGame
-    , timeAndZone : TimeAndZone
+    , sharedModel : Shared.Model
     }
 
 
@@ -90,7 +90,7 @@ init : Shared.Model -> Url Params -> ( Model, Cmd Msg )
 init sharedModel { params } =
     ( { slug = params.quizSlug
       , quiz = Loading
-      , timeAndZone = sharedModel.timeAndZone
+      , sharedModel = sharedModel
       }
     , Quiz.findBySlug QuizFetched params.quizSlug
     )
@@ -98,7 +98,7 @@ init sharedModel { params } =
 
 load : Shared.Model -> Model -> ( Model, Cmd Msg )
 load shared model =
-    ( { model | timeAndZone = shared.timeAndZone }
+    ( { model | sharedModel = shared }
     , Cmd.none
     )
 
@@ -250,11 +250,11 @@ view model =
                 main_ []
                     [ div [ class "quizIdentity" ]
                         [ typography Title1 h2 [ class "quizName", css [ marginBottom Spacing.M ] ] quiz.title
-                        , img [ src quiz.image, css [ marginBottom Spacing.M ], class "quizImage" ] []
+                        , img [ src (quiz.image ++ "?w=200&fit=max"), css [ marginBottom Spacing.M ], class "quizImage" ] []
                         ]
                     , case quiz.state of
                         InProgress state ->
-                            viewQuestion (List.length state.answered + 1 + List.length state.remaining) (List.length state.answered + 1) state.current
+                            viewQuestion model.sharedModel (List.length state.answered + 1 + List.length state.remaining) (List.length state.answered + 1) state.current
 
                         Done { results } ->
                             viewResult model.slug results
@@ -273,14 +273,14 @@ view model =
     }
 
 
-viewQuestion : Int -> Int -> Question -> Html Msg
-viewQuestion questionsCount number question =
+viewQuestion : Shared.Model -> Int -> Int -> Question -> Html Msg
+viewQuestion sharedModel questionsCount number question =
     Keyed.node "div"
         []
         [ ( String.fromInt number
           , div [ class "question panel", id "currentQuestion" ]
                 [ typography Title2 p [ css [ marginBottom Spacing.M ] ] ("(" ++ String.fromInt number ++ "/" ++ String.fromInt questionsCount ++ ") " ++ question.question)
-                , viewMaybe (\image -> img [ src image, class "questionImage" ] []) question.image
+                , viewMaybe (sanityImage sharedModel [ class "questionImage" ]) question.image
                 , Nonempty.toList question.answers
                     |> List.map (\answer -> ( Id.to answer.id, viewAnswer answer ))
                     |> Keyed.ul [ class "answers" ]
